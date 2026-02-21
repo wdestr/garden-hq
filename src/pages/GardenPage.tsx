@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Filter, X, Save, Trash2, Pencil } from 'lucide-react'
 import { PlantCard } from '@/components/garden/PlantCard'
 import { AddPlantDialog } from '@/components/garden/AddPlantDialog'
@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { mockPlants, mockUser } from '@/data/mock'
-import { getPlantingWindow } from '@/data/planting-windows'
+import { getPlantingWindow, SIM_NOW } from '@/data/planting-windows'
 import type { Plant, PlantStatus } from '@/types/garden'
 import { cn } from '@/lib/utils'
 import { format, parseISO, differenceInDays } from 'date-fns'
@@ -39,7 +39,7 @@ export function GardenPage() {
       expectedHarvest: null,
       daysToMaturity: data.daysToMaturity,
       notes: '',
-      zone: '7a',
+      zone: mockUser.zone,
       optimalPlantWindow: { start: '', end: '' },
       wateringFrequency: 'every-2-days',
       sunRequirement: 'full-sun',
@@ -154,10 +154,18 @@ function PlantDetailPanel({ plant, onClose, onSave, onDelete }: PlantDetailPanel
   const [draft, setDraft] = useState<Plant>({ ...plant })
   const [confirmDelete, setConfirmDelete] = useState(false)
 
-  const simNow = new Date('2026-04-23')
+  // Close on Escape key
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') onClose()
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [onClose])
+
   const growthPercent = plant.plantedDate && plant.expectedHarvest
     ? Math.min(100, Math.max(0, Math.round(
-        (differenceInDays(simNow, parseISO(plant.plantedDate)) /
+        (differenceInDays(SIM_NOW, parseISO(plant.plantedDate)) /
         differenceInDays(parseISO(plant.expectedHarvest), parseISO(plant.plantedDate))) * 100
       )))
     : 0

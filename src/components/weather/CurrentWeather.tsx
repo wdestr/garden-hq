@@ -21,33 +21,55 @@ export function CurrentWeather() {
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          <div className="flex items-center gap-2 rounded-lg bg-stone-50 p-3">
-            <Thermometer className="h-4 w-4 text-soil-500" />
-            <div>
+          <div className="rounded-lg bg-stone-50 p-3">
+            <div className="flex items-center gap-2">
+              <Thermometer className="h-4 w-4 text-soil-500" />
               <p className="text-xs text-stone-500">Soil Temp</p>
-              <p className="text-sm font-semibold text-soil-600">{current.soilTemp}&deg;F</p>
             </div>
+            <p className="text-sm font-semibold text-soil-600 mt-1">{current.soilTemp}&deg;F</p>
+            <p className="text-[10px] text-stone-400 mt-0.5">
+              {current.soilTemp >= 70 ? 'Warm — all crops OK' :
+               current.soilTemp >= 60 ? 'Good for warm-season crops' :
+               current.soilTemp >= 50 ? 'Cool-season crops only' :
+               'Too cold for most seeds'}
+            </p>
           </div>
-          <div className="flex items-center gap-2 rounded-lg bg-stone-50 p-3">
-            <Droplets className="h-4 w-4 text-frost-500" />
-            <div>
+          <div className="rounded-lg bg-stone-50 p-3">
+            <div className="flex items-center gap-2">
+              <Droplets className="h-4 w-4 text-frost-500" />
               <p className="text-xs text-stone-500">Humidity</p>
-              <p className="text-sm font-semibold">{current.humidity}%</p>
             </div>
+            <p className="text-sm font-semibold mt-1">{current.humidity}%</p>
+            <p className="text-[10px] text-stone-400 mt-0.5">
+              {current.humidity > 80 ? 'Watch for mildew' :
+               current.humidity > 60 ? 'Comfortable for plants' :
+               'Water more frequently'}
+            </p>
           </div>
-          <div className="flex items-center gap-2 rounded-lg bg-stone-50 p-3">
-            <Wind className="h-4 w-4 text-stone-500" />
-            <div>
+          <div className="rounded-lg bg-stone-50 p-3">
+            <div className="flex items-center gap-2">
+              <Wind className="h-4 w-4 text-stone-500" />
               <p className="text-xs text-stone-500">Wind</p>
-              <p className="text-sm font-semibold">{current.wind} mph</p>
             </div>
+            <p className="text-sm font-semibold mt-1">{current.wind} mph</p>
+            <p className="text-[10px] text-stone-400 mt-0.5">
+              {current.wind > 20 ? 'Stake tall plants' :
+               current.wind > 10 ? 'Moderate — check supports' :
+               'Calm — good for spraying'}
+            </p>
           </div>
-          <div className="flex items-center gap-2 rounded-lg bg-stone-50 p-3">
-            <Sun className="h-4 w-4 text-sun-500" />
-            <div>
+          <div className="rounded-lg bg-stone-50 p-3">
+            <div className="flex items-center gap-2">
+              <Sun className="h-4 w-4 text-sun-500" />
               <p className="text-xs text-stone-500">UV Index</p>
-              <p className="text-sm font-semibold">{current.uvIndex}</p>
             </div>
+            <p className="text-sm font-semibold mt-1">{current.uvIndex}</p>
+            <p className="text-[10px] text-stone-400 mt-0.5">
+              {current.uvIndex >= 8 ? 'Very high — use shade cloth' :
+               current.uvIndex >= 6 ? 'High — great for sun-lovers' :
+               current.uvIndex >= 3 ? 'Moderate' :
+               'Low light today'}
+            </p>
           </div>
         </div>
       </CardContent>

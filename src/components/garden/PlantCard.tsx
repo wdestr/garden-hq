@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import type { Plant } from '@/types/garden'
 import { cn } from '@/lib/utils'
+import { SIM_NOW } from '@/data/planting-windows'
 
 const statusConfig: Record<Plant['status'], { label: string; variant: 'default' | 'success' | 'info' | 'warning' | 'outline' }> = {
   planned: { label: 'Planned', variant: 'outline' },
@@ -29,11 +30,9 @@ interface PlantCardProps {
 export function PlantCard({ plant, onClick }: PlantCardProps) {
   const { label, variant } = statusConfig[plant.status]
 
-  // Use a simulated "now" date in the mock data timeframe (April 23 2026)
-  const simNow = new Date('2026-04-23')
   const growthPercent = plant.plantedDate && plant.expectedHarvest
     ? Math.min(100, Math.max(0, Math.round(
-        (differenceInDays(simNow, parseISO(plant.plantedDate)) /
+        (differenceInDays(SIM_NOW, parseISO(plant.plantedDate)) /
         differenceInDays(parseISO(plant.expectedHarvest), parseISO(plant.plantedDate))) * 100
       )))
     : 0

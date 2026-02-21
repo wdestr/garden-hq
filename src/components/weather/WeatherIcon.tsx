@@ -1,5 +1,6 @@
 import { Sun, CloudSun, Cloud, CloudRain, CloudLightning, Snowflake, CloudFog } from 'lucide-react'
 import type { WeatherCondition } from '@/types/garden'
+import { cn } from '@/lib/utils'
 
 const icons: Record<WeatherCondition, typeof Sun> = {
   'sunny': Sun,
@@ -28,5 +29,5 @@ interface WeatherIconProps {
 
 export function WeatherIcon({ condition, className = 'h-5 w-5' }: WeatherIconProps) {
   const Icon = icons[condition]
-  return <Icon className={`${colors[condition]} ${className}`} />
+  return <Icon className={cn(colors[condition], className)} />
 }

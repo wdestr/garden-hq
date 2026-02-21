@@ -10,11 +10,15 @@ import { CurrentWeather } from '@/components/weather/CurrentWeather'
 import { ForecastStrip } from '@/components/weather/ForecastStrip'
 import { CommunityPulse } from '@/components/garden/CommunityPulse'
 import { mockUser, mockStats, mockActions, mockWeather, mockSuccessions } from '@/data/mock'
+import { daysUntilFirstFrost, firstFrostDate, SIM_NOW } from '@/data/planting-windows'
 
 export function DashboardPage() {
   const [actions, setActions] = useState(mockActions)
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
+
+  const frostDays = daysUntilFirstFrost(mockUser.zone, SIM_NOW)
+  const frostDateStr = firstFrostDate(mockUser.zone)
 
   function toggleAction(id: string) {
     setActions(prev =>
@@ -24,7 +28,9 @@ export function DashboardPage() {
 
   const pendingActions = actions.filter(a => !a.completed).sort((a, b) => {
     const order = { urgent: 0, high: 1, medium: 2, low: 3 }
-    return order[a.priority] - order[b.priority]
+    const priorityDiff = order[a.priority] - order[b.priority]
+    if (priorityDiff !== 0) return priorityDiff
+    return a.dueDate.localeCompare(b.dueDate)
   })
   const completedCount = actions.filter(a => a.completed).length
 
@@ -77,8 +83,9 @@ export function DashboardPage() {
               <Snowflake className="h-5 w-5 text-frost-500" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-stone-900">{mockStats.daysUntilFirstFrost}</p>
+              <p className="text-2xl font-bold text-stone-900">{frostDays}</p>
               <p className="text-xs text-stone-500">Days to Frost</p>
+              {frostDateStr && <p className="text-[10px] text-stone-400">~{frostDateStr}</p>}
             </div>
           </CardContent>
         </Card>
@@ -123,7 +130,7 @@ export function DashboardPage() {
               What's Next?
             </h2>
             <p className="text-sm text-stone-500 mb-3">
-              You have {mockStats.daysUntilFirstFrost} days until first frost. Consider these succession crops:
+              You have {frostDays} days until first frost{frostDateStr ? ` (~${frostDateStr})` : ''}. Consider these succession crops:
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {mockSuccessions.map((s) => (

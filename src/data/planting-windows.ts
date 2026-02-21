@@ -40,7 +40,6 @@ const PLANTING_DATA: Record<string, ZonePlantMap> = {
     'Radishes':    { start: 'Apr 25', end: 'Jun 1' },
     'Swiss Chard': { start: 'May 10', end: 'Jun 15' },
     'Bush Beans':  { start: 'Jun 1',  end: 'Jun 20' },
-    'Cucumber':    { start: 'Jun 1',  end: 'Jun 20' },
   },
   // ── Zone 4 (−30 to −20 °F) ───────────────────────────
   '4': {
@@ -59,7 +58,6 @@ const PLANTING_DATA: Record<string, ZonePlantMap> = {
     'Radishes':    { start: 'Apr 15', end: 'May 30' },
     'Swiss Chard': { start: 'May 1',  end: 'Jun 10' },
     'Bush Beans':  { start: 'May 25', end: 'Jun 15' },
-    'Cucumber':    { start: 'May 25', end: 'Jun 15' },
   },
   // ── Zone 5 (−20 to −10 °F) ───────────────────────────
   '5': {
@@ -78,7 +76,6 @@ const PLANTING_DATA: Record<string, ZonePlantMap> = {
     'Radishes':    { start: 'Apr 1',  end: 'May 20' },
     'Swiss Chard': { start: 'Apr 20', end: 'Jun 1' },
     'Bush Beans':  { start: 'May 15', end: 'Jun 10' },
-    'Cucumber':    { start: 'May 15', end: 'Jun 10' },
   },
   // ── Zone 6 (−10 to 0 °F) ─────────────────────────────
   '6': {
@@ -97,7 +94,6 @@ const PLANTING_DATA: Record<string, ZonePlantMap> = {
     'Radishes':    { start: 'Mar 15', end: 'May 10' },
     'Swiss Chard': { start: 'Apr 10', end: 'May 25' },
     'Bush Beans':  { start: 'May 10', end: 'Jun 5' },
-    'Cucumber':    { start: 'May 10', end: 'Jun 5' },
   },
   // ── Zone 7 (0 to 10 °F) ──────────────────────────────
   '7': {
@@ -116,7 +112,6 @@ const PLANTING_DATA: Record<string, ZonePlantMap> = {
     'Radishes':    { start: 'Mar 1',  end: 'Apr 30' },
     'Swiss Chard': { start: 'Mar 25', end: 'May 15' },
     'Bush Beans':  { start: 'Apr 25', end: 'Jun 5' },
-    'Cucumber':    { start: 'May 1',  end: 'Jun 1' },
   },
   // ── Zone 8 (10 to 20 °F) ─────────────────────────────
   '8': {
@@ -135,7 +130,6 @@ const PLANTING_DATA: Record<string, ZonePlantMap> = {
     'Radishes':    { start: 'Feb 10', end: 'Apr 10' },
     'Swiss Chard': { start: 'Mar 1',  end: 'Apr 30' },
     'Bush Beans':  { start: 'Apr 5',  end: 'May 25' },
-    'Cucumber':    { start: 'Apr 10', end: 'May 20' },
   },
   // ── Zone 9 (20 to 30 °F) ─────────────────────────────
   '9': {
@@ -154,7 +148,6 @@ const PLANTING_DATA: Record<string, ZonePlantMap> = {
     'Radishes':    { start: 'Jan 15', end: 'Mar 15' },
     'Swiss Chard': { start: 'Feb 10', end: 'Apr 10' },
     'Bush Beans':  { start: 'Mar 15', end: 'May 5' },
-    'Cucumber':    { start: 'Mar 20', end: 'May 1' },
   },
   // ── Zone 10 (30 to 40 °F) ────────────────────────────
   '10': {
@@ -173,7 +166,6 @@ const PLANTING_DATA: Record<string, ZonePlantMap> = {
     'Radishes':    { start: 'Jan 1',  end: 'Mar 1' },
     'Swiss Chard': { start: 'Jan 15', end: 'Mar 20' },
     'Bush Beans':  { start: 'Feb 20', end: 'Apr 15' },
-    'Cucumber':    { start: 'Feb 20', end: 'Apr 10' },
   },
 }
 
@@ -305,3 +297,73 @@ export function zipToZone(zip: string): string | null {
 
   return null
 }
+
+/* ─── Frost Date Estimates by Zone ─── */
+
+/** Average first fall frost dates by zone (month, day). */
+const FIRST_FROST: Record<string, [number, number]> = {
+  '3':  [9, 10],   // Sep 10
+  '4':  [9, 25],   // Sep 25
+  '5':  [10, 10],  // Oct 10
+  '6':  [10, 20],  // Oct 20
+  '7':  [10, 30],  // Oct 30
+  '8':  [11, 15],  // Nov 15
+  '9':  [12, 5],   // Dec 5
+  '10': [12, 25],  // Dec 25 (rare frost)
+}
+
+/** Average last spring frost dates by zone (month, day). */
+const LAST_FROST: Record<string, [number, number]> = {
+  '3':  [5, 25],  // May 25
+  '4':  [5, 10],  // May 10
+  '5':  [4, 25],  // Apr 25
+  '6':  [4, 15],  // Apr 15
+  '7':  [4, 5],   // Apr 5
+  '8':  [3, 20],  // Mar 20
+  '9':  [2, 28],  // Feb 28
+  '10': [2, 1],   // Feb 1
+}
+
+/**
+ * Estimated days until first fall frost from a given date.
+ */
+export function daysUntilFirstFrost(zone: string, from: Date = new Date()): number {
+  const baseZone = zone.replace(/[ab]/i, '')
+  const frost = FIRST_FROST[baseZone]
+  if (!frost) return 180 // fallback
+
+  const year = from.getFullYear()
+  const frostDate = new Date(year, frost[0] - 1, frost[1])
+
+  // If frost date has passed this year, use next year
+  if (frostDate < from) {
+    frostDate.setFullYear(year + 1)
+  }
+
+  return Math.max(0, Math.round((frostDate.getTime() - from.getTime()) / (1000 * 60 * 60 * 24)))
+}
+
+/**
+ * Get last spring frost date string for display.
+ */
+export function lastFrostDate(zone: string): string | null {
+  const baseZone = zone.replace(/[ab]/i, '')
+  const frost = LAST_FROST[baseZone]
+  if (!frost) return null
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  return `${months[frost[0] - 1]} ${frost[1]}`
+}
+
+/**
+ * Get first fall frost date string for display.
+ */
+export function firstFrostDate(zone: string): string | null {
+  const baseZone = zone.replace(/[ab]/i, '')
+  const frost = FIRST_FROST[baseZone]
+  if (!frost) return null
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  return `${months[frost[0] - 1]} ${frost[1]}`
+}
+
+/** The simulated "now" date for the demo (matches mock data). */
+export const SIM_NOW = new Date('2026-04-23')

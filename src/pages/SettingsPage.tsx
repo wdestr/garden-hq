@@ -83,6 +83,7 @@ export function SettingsPage() {
               disabled
               className="w-full rounded-lg border border-stone-200 bg-stone-50 px-3 py-2.5 text-sm text-stone-400"
             />
+            <p className="text-xs text-stone-400 mt-1">Email can be changed through your account provider.</p>
           </div>
         </CardContent>
       </Card>
@@ -161,7 +162,19 @@ export function SettingsPage() {
         </CardContent>
       </Card>
 
-      <Button className="w-full sm:w-auto">Save Changes</Button>
+      <Button
+        className="w-full sm:w-auto"
+        onClick={() => {
+          // In production this would persist to Supabase
+          mockUser.name = name
+          mockUser.zipCode = zip
+          const newZone = detectedZone
+          if (newZone) mockUser.zone = newZone
+          toast.success('Settings saved!')
+        }}
+      >
+        Save Changes
+      </Button>
     </div>
   )
 }

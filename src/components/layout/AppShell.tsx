@@ -1,11 +1,27 @@
-import { useState } from 'react'
-import { Outlet } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { Outlet, useLocation } from 'react-router-dom'
 import { Menu } from 'lucide-react'
 import { Sidebar } from './Sidebar'
 import { Button } from '@/components/ui/button'
 
+const PAGE_TITLES: Record<string, string> = {
+  '/': 'Dashboard',
+  '/garden': 'My Garden',
+  '/calendar': 'Planting Calendar',
+  '/weather': 'Weather & Alerts',
+  '/guides': 'Growing Guides',
+  '/community': 'Community',
+  '/settings': 'Settings',
+}
+
 export function AppShell() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const location = useLocation()
+
+  useEffect(() => {
+    const title = PAGE_TITLES[location.pathname] || 'Garden HQ'
+    document.title = `${title} | Garden HQ`
+  }, [location.pathname])
 
   return (
     <div className="min-h-screen bg-stone-50">
