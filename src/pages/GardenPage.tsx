@@ -5,7 +5,8 @@ import { AddPlantDialog } from '@/components/garden/AddPlantDialog'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
-import { mockPlants, mockUser } from '@/data/mock'
+import { useUser } from '@/context/UserContext'
+import { mockPlants } from '@/data/mock'
 import { getPlantingWindow, SIM_NOW } from '@/data/planting-windows'
 import type { Plant, PlantStatus } from '@/types/garden'
 import { cn } from '@/lib/utils'
@@ -22,6 +23,7 @@ const statusFilters: { value: PlantStatus | 'all'; label: string }[] = [
 ]
 
 export function GardenPage() {
+  const { user } = useUser()
   const [plants, setPlants] = useState<Plant[]>(mockPlants)
   const [filter, setFilter] = useState<PlantStatus | 'all'>('all')
   const [selectedPlant, setSelectedPlant] = useState<Plant | null>(null)
@@ -39,7 +41,7 @@ export function GardenPage() {
       expectedHarvest: null,
       daysToMaturity: data.daysToMaturity,
       notes: '',
-      zone: mockUser.zone,
+      zone: user.zone,
       optimalPlantWindow: { start: '', end: '' },
       wateringFrequency: 'every-2-days',
       sunRequirement: 'full-sun',
@@ -150,6 +152,7 @@ interface PlantDetailPanelProps {
 }
 
 function PlantDetailPanel({ plant, onClose, onSave, onDelete }: PlantDetailPanelProps) {
+  const { user } = useUser()
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState<Plant>({ ...plant })
   const [confirmDelete, setConfirmDelete] = useState(false)
@@ -171,7 +174,7 @@ function PlantDetailPanel({ plant, onClose, onSave, onDelete }: PlantDetailPanel
     : 0
 
   // Get zone-based planting window
-  const zoneWindow = getPlantingWindow(plant.name, mockUser.zone)
+  const zoneWindow = getPlantingWindow(plant.name, user.zone)
 
   function handleSave() {
     onSave(draft)
@@ -340,10 +343,10 @@ function PlantDetailPanel({ plant, onClose, onSave, onDelete }: PlantDetailPanel
           <div className="rounded-lg bg-frost-50 p-3 mb-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-medium text-frost-700">Optimal planting window for Zone {mockUser.zone}</p>
+                <p className="text-xs font-medium text-frost-700">Optimal planting window for Zone {user.zone}</p>
                 <p className="text-sm font-semibold text-frost-900 mt-0.5">{zoneWindow.start} – {zoneWindow.end}</p>
               </div>
-              <Badge variant="info" className="text-[10px]">{mockUser.location}</Badge>
+              <Badge variant="info" className="text-[10px]">{user.location}</Badge>
             </div>
           </div>
         )}

@@ -4,13 +4,15 @@ import { ChevronLeft, ChevronRight, Sprout, Info } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { mockPlants, mockActions, mockUser } from '@/data/mock'
+import { useUser } from '@/context/UserContext'
+import { mockPlants, mockActions } from '@/data/mock'
 import { getAllPlantingWindows } from '@/data/planting-windows'
 import { cn } from '@/lib/utils'
 
 const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
 export function CalendarPage() {
+  const { user } = useUser()
   const [currentMonth, setCurrentMonth] = useState(new Date(2026, 3, 1)) // April 2026 to match mock data
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
 
@@ -179,14 +181,14 @@ export function CalendarPage() {
             <CardContent className="p-5">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-serif text-lg font-bold text-stone-900">Planting Windows</h3>
-                <Badge variant="info" className="text-[10px]">Zone {mockUser.zone}</Badge>
+                <Badge variant="info" className="text-[10px]">Zone {user.zone}</Badge>
               </div>
               <p className="text-xs text-stone-400 mb-3 flex items-start gap-1">
                 <Info className="h-3 w-3 mt-0.5 shrink-0" />
-                Based on your location in {mockUser.location}
+                Based on your location in {user.location}
               </p>
               <div className="space-y-2">
-                {getAllPlantingWindows(mockUser.zone)
+                {getAllPlantingWindows(user.zone)
                   .filter(({ plantName }) =>
                     mockPlants.some(p => p.name.toLowerCase() === plantName.toLowerCase())
                   )

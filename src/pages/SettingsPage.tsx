@@ -2,13 +2,15 @@ import { useState, useMemo } from 'react'
 import { MapPin, User, Bell, Locate } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { mockUser } from '@/data/mock'
+import { useUser } from '@/context/UserContext'
 import { zipToZone } from '@/data/planting-windows'
 import { toast } from 'sonner'
 
 export function SettingsPage() {
-  const [name, setName] = useState(mockUser.name)
-  const [zip, setZip] = useState(mockUser.zipCode)
+  const { user, updateUser, updateZip } = useUser()
+  const [name, setName] = useState(user.name)
+  const [zip, setZip] = useState(user.zipCode)
+  const [locationLabel, setLocationLabel] = useState(user.location)
   const [notifications, setNotifications] = useState({
     frostAlerts: true,
     weeklyDigest: true,
@@ -28,7 +30,6 @@ export function SettingsPage() {
       async (pos) => {
         try {
           const { latitude, longitude } = pos.coords
-          // Use a free reverse geocoding API to get ZIP from coords
           const res = await fetch(
             `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
           )
@@ -36,7 +37,11 @@ export function SettingsPage() {
           const postcode = data.postcode
           if (postcode) {
             setZip(postcode)
-            toast.success(`Location detected: ${data.locality || data.city || 'Unknown'}, ${data.principalSubdivision || ''} ${postcode}`)
+            const city = data.locality || data.city || 'Unknown'
+            const state = data.principalSubdivision || ''
+            const loc = `${city}, ${state}`
+            setLocationLabel(loc)
+            toast.success(`Location detected: ${loc} ${postcode}`)
           } else {
             toast.error('Could not determine ZIP code from your location')
           }
@@ -48,6 +53,16 @@ export function SettingsPage() {
         toast.error('Location access denied. Enter your ZIP manually.')
       }
     )
+  }
+
+  function handleSave() {
+    updateUser({
+      name,
+      zipCode: zip,
+      location: locationLabel,
+    })
+    updateZip(zip)
+    toast.success('Settings saved! Zone and location updated across the app.')
   }
 
   return (
@@ -79,7 +94,7 @@ export function SettingsPage() {
             <label className="block text-sm font-medium text-stone-700 mb-1">Email</label>
             <input
               type="email"
-              value={mockUser.email}
+              value={user.email}
               disabled
               className="w-full rounded-lg border border-stone-200 bg-stone-50 px-3 py-2.5 text-sm text-stone-400"
             />
@@ -105,7 +120,7 @@ export function SettingsPage() {
                 value={zip}
                 onChange={(e) => setZip(e.target.value.replace(/\D/g, '').slice(0, 5))}
                 maxLength={5}
-                placeholder="e.g. 11201"
+                placeholder="e.g. 90275"
                 className="flex-1 rounded-lg border border-stone-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-garden-500 focus:border-transparent"
               />
               <Button variant="outline" size="sm" onClick={handleDetectLocation} className="shrink-0 h-auto">
@@ -113,6 +128,17 @@ export function SettingsPage() {
                 Detect
               </Button>
             </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-stone-700 mb-1">Location Name</label>
+            <input
+              type="text"
+              value={locationLabel}
+              onChange={(e) => setLocationLabel(e.target.value)}
+              placeholder="e.g. Rancho Palos Verdes, CA"
+              className="w-full rounded-lg border border-stone-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-garden-500 focus:border-transparent"
+            />
+            <p className="text-xs text-stone-400 mt-1">Auto-detected when you use the Detect button, or type your own.</p>
           </div>
           <div className="rounded-lg bg-garden-50 p-3">
             {detectedZone ? (
@@ -162,17 +188,7 @@ export function SettingsPage() {
         </CardContent>
       </Card>
 
-      <Button
-        className="w-full sm:w-auto"
-        onClick={() => {
-          // In production this would persist to Supabase
-          mockUser.name = name
-          mockUser.zipCode = zip
-          const newZone = detectedZone
-          if (newZone) mockUser.zone = newZone
-          toast.success('Settings saved!')
-        }}
-      >
+      <Button className="w-full sm:w-auto" onClick={handleSave}>
         Save Changes
       </Button>
     </div>

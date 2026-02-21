@@ -9,16 +9,18 @@ import { ActionItem } from '@/components/garden/ActionItem'
 import { CurrentWeather } from '@/components/weather/CurrentWeather'
 import { ForecastStrip } from '@/components/weather/ForecastStrip'
 import { CommunityPulse } from '@/components/garden/CommunityPulse'
-import { mockUser, mockStats, mockActions, mockWeather, mockSuccessions } from '@/data/mock'
+import { useUser } from '@/context/UserContext'
+import { mockStats, mockActions, mockWeather, mockSuccessions } from '@/data/mock'
 import { daysUntilFirstFrost, firstFrostDate, SIM_NOW } from '@/data/planting-windows'
 
 export function DashboardPage() {
+  const { user } = useUser()
   const [actions, setActions] = useState(mockActions)
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
 
-  const frostDays = daysUntilFirstFrost(mockUser.zone, SIM_NOW)
-  const frostDateStr = firstFrostDate(mockUser.zone)
+  const frostDays = daysUntilFirstFrost(user.zone, SIM_NOW)
+  const frostDateStr = firstFrostDate(user.zone)
 
   function toggleAction(id: string) {
     setActions(prev =>
@@ -39,10 +41,10 @@ export function DashboardPage() {
       {/* Header */}
       <div>
         <h1 className="font-serif text-2xl sm:text-3xl font-bold text-stone-900">
-          {greeting}, {mockUser.name}! <span className="inline-block">🌿</span>
+          {greeting}, {user.name}! <span className="inline-block">🌿</span>
         </h1>
         <p className="text-stone-500 mt-1">
-          {mockUser.location} &middot; Zone {mockUser.zone}
+          {user.location} &middot; Zone {user.zone}
         </p>
       </div>
 

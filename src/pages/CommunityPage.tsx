@@ -1,6 +1,7 @@
 import { Users, MapPin, TrendingUp, MessageSquare } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
-import { mockCommunity, mockUser } from '@/data/mock'
+import { useUser } from '@/context/UserContext'
+import { mockCommunity } from '@/data/mock'
 
 const recentActivity = [
   { user: 'Sarah M.', action: 'planted Tomatoes (Sun Gold)', time: '2 hours ago', emoji: '🍅' },
@@ -11,11 +12,12 @@ const recentActivity = [
 ]
 
 export function CommunityPage() {
+  const { user } = useUser()
   return (
     <div className="space-y-6">
       <div>
         <h1 className="font-serif text-2xl sm:text-3xl font-bold text-stone-900">Community</h1>
-        <p className="text-stone-500 mt-1">See what gardeners near {mockUser.location} are growing</p>
+        <p className="text-stone-500 mt-1">See what gardeners near {user.location} are growing</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -24,7 +26,7 @@ export function CommunityPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="h-4.5 w-4.5 text-garden-600" />
-              Popular in Zone {mockUser.zone}
+              Popular in Zone {user.zone}
             </CardTitle>
           </CardHeader>
           <CardContent>

@@ -10,7 +10,7 @@ import {
   LogOut,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { mockUser } from '@/data/mock'
+import { useUser } from '@/context/UserContext'
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
@@ -27,6 +27,7 @@ interface SidebarProps {
 }
 
 export function Sidebar({ open, onClose }: SidebarProps) {
+  const { user } = useUser()
   return (
     <>
       {/* Mobile overlay */}
@@ -97,11 +98,11 @@ export function Sidebar({ open, onClose }: SidebarProps) {
 
           <div className="flex items-center gap-3 rounded-lg px-3 py-2.5">
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-garden-700 text-xs font-bold">
-              {mockUser.name.charAt(0)}
+              {user.name.charAt(0)}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white truncate">{mockUser.name}</p>
-              <p className="text-[11px] text-garden-400 truncate">{mockUser.location} &middot; Zone {mockUser.zone}</p>
+              <p className="text-sm font-medium text-white truncate">{user.name}</p>
+              <p className="text-[11px] text-garden-400 truncate">{user.location} &middot; Zone {user.zone}</p>
             </div>
             <button className="text-garden-400 hover:text-white transition-colors cursor-pointer" title="Sign out">
               <LogOut className="h-4 w-4" />
