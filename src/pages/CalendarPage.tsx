@@ -1,10 +1,11 @@
 import { useState } from 'react'
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, isSameDay, parseISO, addMonths, subMonths } from 'date-fns'
-import { ChevronLeft, ChevronRight, Sprout } from 'lucide-react'
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, isSameDay, addMonths, subMonths } from 'date-fns'
+import { ChevronLeft, ChevronRight, Sprout, Info } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { mockPlants, mockActions } from '@/data/mock'
+import { mockPlants, mockActions, mockUser } from '@/data/mock'
+import { getAllPlantingWindows } from '@/data/planting-windows'
 import { cn } from '@/lib/utils'
 
 const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
@@ -173,22 +174,36 @@ export function CalendarPage() {
             </Card>
           )}
 
-          {/* Planting windows */}
+          {/* Planting windows (zone-based) */}
           <Card>
             <CardContent className="p-5">
-              <h3 className="font-serif text-lg font-bold text-stone-900 mb-3">Planting Windows</h3>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-serif text-lg font-bold text-stone-900">Planting Windows</h3>
+                <Badge variant="info" className="text-[10px]">Zone {mockUser.zone}</Badge>
+              </div>
+              <p className="text-xs text-stone-400 mb-3 flex items-start gap-1">
+                <Info className="h-3 w-3 mt-0.5 shrink-0" />
+                Based on your location in {mockUser.location}
+              </p>
               <div className="space-y-2">
-                {mockPlants.filter(p => p.optimalPlantWindow.start).slice(0, 5).map(plant => (
-                  <div key={plant.id} className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-2">
-                      <span>{plant.emoji}</span>
-                      <span className="text-stone-700">{plant.name}</span>
-                    </div>
-                    <Badge variant="default" className="text-[10px]">
-                      {format(parseISO(plant.optimalPlantWindow.start), 'MMM d')} - {format(parseISO(plant.optimalPlantWindow.end), 'MMM d')}
-                    </Badge>
-                  </div>
-                ))}
+                {getAllPlantingWindows(mockUser.zone)
+                  .filter(({ plantName }) =>
+                    mockPlants.some(p => p.name.toLowerCase() === plantName.toLowerCase())
+                  )
+                  .map(({ plantName, window: w }) => {
+                    const plant = mockPlants.find(p => p.name.toLowerCase() === plantName.toLowerCase())
+                    return (
+                      <div key={plantName} className="flex items-center justify-between text-sm">
+                        <div className="flex items-center gap-2">
+                          <span>{plant?.emoji ?? '🌱'}</span>
+                          <span className="text-stone-700">{plantName}</span>
+                        </div>
+                        <Badge variant="default" className="text-[10px]">
+                          {w.start} – {w.end}
+                        </Badge>
+                      </div>
+                    )
+                  })}
               </div>
             </CardContent>
           </Card>

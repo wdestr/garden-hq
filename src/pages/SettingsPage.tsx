@@ -1,8 +1,10 @@
-import { useState } from 'react'
-import { MapPin, User, Bell } from 'lucide-react'
+import { useState, useMemo } from 'react'
+import { MapPin, User, Bell, Locate } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { mockUser } from '@/data/mock'
+import { zipToZone } from '@/data/planting-windows'
+import { toast } from 'sonner'
 
 export function SettingsPage() {
   const [name, setName] = useState(mockUser.name)
@@ -13,6 +15,40 @@ export function SettingsPage() {
     communityUpdates: false,
     plantReminders: true,
   })
+
+  const detectedZone = useMemo(() => zipToZone(zip), [zip])
+
+  function handleDetectLocation() {
+    if (!navigator.geolocation) {
+      toast.error('Geolocation not supported by your browser')
+      return
+    }
+    toast.info('Detecting your location...')
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        try {
+          const { latitude, longitude } = pos.coords
+          // Use a free reverse geocoding API to get ZIP from coords
+          const res = await fetch(
+            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
+          )
+          const data = await res.json()
+          const postcode = data.postcode
+          if (postcode) {
+            setZip(postcode)
+            toast.success(`Location detected: ${data.locality || data.city || 'Unknown'}, ${data.principalSubdivision || ''} ${postcode}`)
+          } else {
+            toast.error('Could not determine ZIP code from your location')
+          }
+        } catch {
+          toast.error('Failed to look up your location')
+        }
+      },
+      () => {
+        toast.error('Location access denied. Enter your ZIP manually.')
+      }
+    )
+  }
 
   return (
     <div className="space-y-6 max-w-2xl">
@@ -62,21 +98,42 @@ export function SettingsPage() {
         <CardContent className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-stone-700 mb-1">ZIP Code</label>
-            <input
-              type="text"
-              value={zip}
-              onChange={(e) => setZip(e.target.value)}
-              maxLength={5}
-              className="w-full rounded-lg border border-stone-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-garden-500 focus:border-transparent"
-            />
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={zip}
+                onChange={(e) => setZip(e.target.value.replace(/\D/g, '').slice(0, 5))}
+                maxLength={5}
+                placeholder="e.g. 11201"
+                className="flex-1 rounded-lg border border-stone-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-garden-500 focus:border-transparent"
+              />
+              <Button variant="outline" size="sm" onClick={handleDetectLocation} className="shrink-0 h-auto">
+                <Locate className="h-4 w-4 mr-1.5" />
+                Detect
+              </Button>
+            </div>
           </div>
           <div className="rounded-lg bg-garden-50 p-3">
-            <p className="text-sm text-garden-800">
-              <span className="font-medium">Detected:</span> {mockUser.location} &middot; USDA Zone {mockUser.zone}
-            </p>
-            <p className="text-xs text-garden-600 mt-1">
-              Your almanac recommendations are tuned for this zone.
-            </p>
+            {detectedZone ? (
+              <>
+                <p className="text-sm text-garden-800">
+                  <span className="font-medium">USDA Hardiness Zone {detectedZone}</span>
+                  {zip.length === 5 && <span className="text-garden-600"> · ZIP {zip}</span>}
+                </p>
+                <p className="text-xs text-garden-600 mt-1">
+                  Your planting windows and almanac recommendations are tuned for this zone.
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="text-sm text-stone-500">
+                  Enter a valid US ZIP code to detect your growing zone.
+                </p>
+                <p className="text-xs text-stone-400 mt-1">
+                  This determines your planting windows and frost dates.
+                </p>
+              </>
+            )}
           </div>
         </CardContent>
       </Card>
