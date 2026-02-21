@@ -293,17 +293,4 @@ export const mockSuccessions: SuccessionSuggestion[] = [
   },
 ]
 
-export const PLANT_CATALOG = [
-  { name: 'Tomatoes', varieties: ['Cherry (Sun Gold)', 'Roma', 'Beefsteak', 'Brandywine'], emoji: '\u{1F345}', daysToMaturity: 65 },
-  { name: 'Peppers', varieties: ['Bell (California Wonder)', 'Jalapeno', 'Habanero', 'Banana'], emoji: '\u{1FAD1}', daysToMaturity: 75 },
-  { name: 'Lettuce', varieties: ['Buttercrunch', 'Romaine', 'Red Leaf', 'Iceberg'], emoji: '\u{1F96C}', daysToMaturity: 45 },
-  { name: 'Carrots', varieties: ['Nantes', 'Danvers', 'Chantenay', 'Purple Haze'], emoji: '\u{1F955}', daysToMaturity: 70 },
-  { name: 'Basil', varieties: ['Genovese', 'Thai', 'Purple', 'Lemon'], emoji: '\u{1F33F}', daysToMaturity: 60 },
-  { name: 'Zucchini', varieties: ['Black Beauty', 'Golden', 'Costata Romanesco'], emoji: '\u{1F952}', daysToMaturity: 50 },
-  { name: 'Snap Peas', varieties: ['Sugar Ann', 'Sugar Snap', 'Cascadia'], emoji: '\u{1FAD8}', daysToMaturity: 58 },
-  { name: 'Cucumbers', varieties: ['Marketmore', 'Lemon', 'Pickling'], emoji: '\u{1F952}', daysToMaturity: 55 },
-  { name: 'Green Beans', varieties: ['Provider', 'Blue Lake', 'Kentucky Wonder'], emoji: '\u{1FAD8}', daysToMaturity: 55 },
-  { name: 'Spinach', varieties: ['Bloomsdale', 'Baby Leaf', 'Savoy'], emoji: '\u{1F96C}', daysToMaturity: 40 },
-  { name: 'Kale', varieties: ['Lacinato', 'Red Russian', 'Curly'], emoji: '\u{1F96C}', daysToMaturity: 55 },
-  { name: 'Radishes', varieties: ['Cherry Belle', 'French Breakfast', 'Watermelon'], emoji: '\u{1F4AE}', daysToMaturity: 25 },
-]
+// Plant catalog moved to @/data/plant-catalog.ts

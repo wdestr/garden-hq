@@ -422,12 +422,35 @@ function PlantDetailPanel({ plant, onClose, onSave, onDelete }: PlantDetailPanel
             )}
           </div>
         ) : (
-          <div className="flex gap-2">
-            <Button variant="outline" className="flex-1" onClick={onClose}>Close</Button>
-            <Button className="flex-1" onClick={() => setEditing(true)}>
-              <Pencil className="h-4 w-4 mr-1.5" />
-              Edit Plant
-            </Button>
+          <div className="space-y-2">
+            <div className="flex gap-2">
+              <Button variant="outline" className="flex-1" onClick={onClose}>Close</Button>
+              <Button className="flex-1" onClick={() => setEditing(true)}>
+                <Pencil className="h-4 w-4 mr-1.5" />
+                Edit Plant
+              </Button>
+            </div>
+            {confirmDelete ? (
+              <div className="rounded-lg bg-red-50 border border-red-200 p-3 mt-2">
+                <p className="text-sm text-red-800 mb-2">Remove this plant from your garden?</p>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" className="flex-1" onClick={() => setConfirmDelete(false)}>
+                    Keep it
+                  </Button>
+                  <Button variant="destructive" size="sm" className="flex-1" onClick={() => onDelete(plant.id)}>
+                    Yes, remove
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <button
+                onClick={() => setConfirmDelete(true)}
+                className="w-full text-center text-xs text-red-400 hover:text-red-600 transition-colors py-2 cursor-pointer"
+              >
+                <Trash2 className="h-3 w-3 inline mr-1" />
+                Remove from garden
+              </button>
+            )}
           </div>
         )}
       </div>

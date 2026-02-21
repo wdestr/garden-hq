@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Sprout, TrendingUp, Scissors, Snowflake, ArrowRight } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
@@ -15,6 +15,7 @@ import { daysUntilFirstFrost, firstFrostDate, SIM_NOW } from '@/data/planting-wi
 
 export function DashboardPage() {
   const { user } = useUser()
+  const navigate = useNavigate()
   const [actions, setActions] = useState(mockActions)
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
@@ -55,7 +56,7 @@ export function DashboardPage() {
 
       {/* Stats bar */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <Card>
+        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate('/garden')}>
           <CardContent className="p-4 flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-garden-100">
               <Sprout className="h-5 w-5 text-garden-600" />
@@ -67,7 +68,7 @@ export function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate('/garden')}>
           <CardContent className="p-4 flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sun-100">
               <Scissors className="h-5 w-5 text-sun-600" />
@@ -79,7 +80,7 @@ export function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate('/weather')}>
           <CardContent className="p-4 flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-frost-100">
               <Snowflake className="h-5 w-5 text-frost-500" />
@@ -92,7 +93,7 @@ export function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate('/garden')}>
           <CardContent className="p-4 flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-garden-100">
               <TrendingUp className="h-5 w-5 text-garden-600" />
@@ -161,9 +162,15 @@ export function DashboardPage() {
 
         {/* Right column - Weather & Community */}
         <div className="space-y-4">
-          <CurrentWeather />
-          <ForecastStrip />
-          <CommunityPulse />
+          <div className="cursor-pointer" onClick={() => navigate('/weather')}>
+            <CurrentWeather />
+          </div>
+          <div className="cursor-pointer" onClick={() => navigate('/weather')}>
+            <ForecastStrip />
+          </div>
+          <div className="cursor-pointer" onClick={() => navigate('/community')}>
+            <CommunityPulse />
+          </div>
 
           <Link to="/garden">
             <Button variant="outline" className="w-full gap-2 mt-2">
